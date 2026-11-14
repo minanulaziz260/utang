@@ -28,6 +28,29 @@ export function formatDateSlash(isoDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
+export function addMonthsToIsoDate(
+  isoDate: string,
+  monthsToAdd: number
+): string {
+  const [yStr, mStr, dStr] = isoDate.split('-');
+  const year = Number(yStr);
+  const month = Number(mStr);
+  const day = Number(dStr);
+  if (!year || !month || !day) return isoDate;
+
+  const targetMonthIndex = month - 1 + monthsToAdd;
+  const targetYear = year + Math.floor(targetMonthIndex / 12);
+  const normalizedMonth = ((targetMonthIndex % 12) + 12) % 12;
+  const lastDayOfTargetMonth = new Date(
+    targetYear,
+    normalizedMonth + 1,
+    0
+  ).getDate();
+  const clampedDay = Math.min(day, lastDayOfTargetMonth);
+
+  return `${targetYear}-${String(normalizedMonth + 1).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;
+}
+
 export interface StatusMeta {
   label: string;
   badgeClass: string;

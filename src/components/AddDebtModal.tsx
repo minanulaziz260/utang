@@ -1,26 +1,32 @@
-import { X } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
+import { Calendar, X } from 'lucide-react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { BANK_OPTIONS } from '../constants/banks';
 import type { BankOption, CreateDebtInput } from '../types/debt';
+import {
+  addMonthsToIsoDate,
+  formatDateSlash,
+  formatRupiah,
+} from '../utils/formatters';
 
 interface AddDebtModalProps {
   isOpen: boolean;
   prefillFriend?: { name: string; phone?: string } | null;
   onClose: () => void;
-  onSubmit: (input: CreateDebtInput) => void;
+  onSubmitBatch: (inputs: CreateDebtInput[]) => void;
 }
 
 export function AddDebtModal({
   isOpen,
   prefillFriend = null,
   onClose,
-  onSubmit,
+  onSubmitBatch,
 }: AddDebtModalProps) {
   const [friendName, setFriendName] = useState('');
   const [phone, setPhone] = useState('');
   const [bank, setBank] = useState<BankOption>('Bank Jago');
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState('2026-12-01');
+  const [periods, setPeriods] = useState('1');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +41,7 @@ export function AddDebtModal({
     setBank('Bank Jago');
     setAmount('');
     setDueDate('2026-12-01');
+    setPeriods('1');
     setNotes('');
     setError(null);
   }, [isOpen, prefillFriend]);
@@ -48,11 +55,25 @@ export function AddDebtModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  const periodCount = useMemo(() => {
+    const parsed = Number(periods);
+    if (!Number.isInteger(parsed) || parsed < 1) return 1;
+    return Math.min(parsed, 36);
+  }, [periods]);
+
+  const generatedDates = useMemo(() => {
+    if (!dueDate) return [];
+    return Array.from({ length: periodCount }, (_, idx) =>
+      addMonthsToIsoDate(dueDate, idx)
+    );
+  }, [dueDate, periodCount]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const numericAmount = Number(amount);
+    const parsedPeriods = Number(periods);
 
     if (!friendName.trim()) {
       setError('Nama teman wajib diisi.');
@@ -63,24 +84,35 @@ export function AddDebtModal({
       return;
     }
     if (!dueDate) {
-      setError('Tanggal jatuh tempo wajib dipilih.');
+      setError('Tanggal jatuh tempo awal wajib dipilih.');
+      return;
+    }
+    if (!Number.isInteger(parsedPeriods) || parsedPeriods < 1 || parsedPeriods > 36) {
+      setError('Jumlah periode harus antara 1 sampai 36 bulan.');
       return;
     }
 
-    onSubmit({
+    const baseNote = notes.trim();
+    const inputs: CreateDebtInput[] = generatedDates.map((date, idx) => ({
       friendName: friendName.trim(),
       phone: phone.trim() || undefined,
       bank,
       principalAmount: numericAmount,
-      dueDate,
-      notes: notes.trim() || undefined,
-    });
+      dueDate: date,
+      notes:
+        parsedPeriods > 1
+          ? `${baseNote ? `${baseNote} ` : ''}(Periode ${idx + 1}/${parsedPeriods})`
+          : baseNote || undefined,
+    }));
+
+    onSubmitBatch(inputs);
 
     setFriendName('');
     setPhone('');
     setBank('Bank Jago');
     setAmount('');
     setDueDate('2026-12-01');
+    setPeriods('1');
     setNotes('');
     setError(null);
     onClose();
@@ -210,7 +242,7 @@ export function AddDebtModal({
                 htmlFor="debt-due-date"
                 className="block text-xs font-medium text-slate-800 mb-1.5"
               >
-                Tanggal Jatuh Tempo
+                Jatuh Tempo Awal
               </label>
               <input
                 id="debt-due-date"
@@ -220,6 +252,55 @@ export function AddDebtModal({
                 className="w-full rounded-lg border border-slate-300 px-3 py-2.5 min-h-[44px] text-sm text-slate-900 tabular-nums focus:border-emerald-700 focus:outline-none"
               />
             </div>
+
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="debt-periods"
+                className="block text-xs font-medium text-slate-800 mb-1.5"
+              >
+                Auto Generate Periode (Bulan)
+              </label>
+              <input
+                id="debt-periods"
+                type="number"
+                min={1}
+                max={36}
+                value={periods}
+                onChange={(e) => setPeriods(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 min-h-[44px] text-sm text-slate-900 tabular-nums focus:border-emerald-700 focus:outline-none"
+              />
+              <p className="mt-1 text-[11px] text-slate-600">
+                Isi lebih dari 1 (misal 5) untuk otomatis membuat tagihan bulan-bulan berikutnya.
+              </p>
+            </div>
+
+            {periodCount > 1 && generatedDates.length > 0 && (
+              <div className="sm:col-span-2 rounded-lg bg-emerald-50/60 border border-emerald-200 p-3 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-emerald-900">
+                    Jadwal Auto Generate ({periodCount} periode)
+                  </span>
+                  {Number(amount) > 0 && (
+                    <span className="font-bold text-emerald-900 tabular-nums">
+                      Total: {formatRupiah(Number(amount) * periodCount)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {generatedDates.map((d, idx) => (
+                    <span
+                      key={d}
+                      className="inline-flex items-center gap-1 rounded-md bg-white border border-emerald-200 px-2 py-1 text-[11px] font-medium text-slate-800 tabular-nums"
+                    >
+                      <Calendar className="h-3 w-3 text-emerald-700" aria-hidden="true" />
+                      <span>
+                        #{idx + 1} {formatDateSlash(d)}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="sm:col-span-2">
               <label

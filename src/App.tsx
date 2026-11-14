@@ -65,17 +65,6 @@ export function App() {
     }, 4000);
   };
 
-  const handleAddDebt = (input: CreateDebtInput) => {
-    const { transaction, newFriend } = buildNewDebtRecord(input, friends);
-    setTransactions((prev) => [transaction, ...prev]);
-    if (newFriend) {
-      setFriends((prev) => [newFriend, ...prev]);
-    }
-    showFeedback(
-      `Catatan hutang untuk ${transaction.friendName} ditambahkan ke daftar simulasi.`
-    );
-  };
-
   const handleAddDebtBatch = (inputs: CreateDebtInput[]) => {
     let workingFriends = [...friends];
     const newFriendsToAdd: typeof friends = [];
@@ -252,7 +241,7 @@ export function App() {
           setIsAddDebtOpen(false);
           setPrefillFriend(null);
         }}
-        onSubmit={handleAddDebt}
+        onSubmitBatch={handleAddDebtBatch}
       />
 
       <PasteDebtModal
