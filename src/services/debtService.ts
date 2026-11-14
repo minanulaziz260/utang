@@ -15,16 +15,49 @@ import type {
  * (menggantikan data simulasi in-memory ini dengan query tabel `friends`,
  * `debt_transactions`, dan `payment_records`).
  */
-export function getInitialSimulatedState(): {
+const STORAGE_KEY = 'temanhutang_state_v1';
+
+export interface StoredAppState {
   friends: Friend[];
   transactions: DebtTransaction[];
   payments: PaymentRecord[];
-} {
-  return {
-    friends: [],
-    transactions: [],
-    payments: [],
-  };
+}
+
+export function getInitialSimulatedState(): StoredAppState {
+  if (typeof window === 'undefined') {
+    return { friends: [], transactions: [], payments: [] };
+  }
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return { friends: [], transactions: [], payments: [] };
+    }
+    const parsed = JSON.parse(raw) as Partial<StoredAppState>;
+    return {
+      friends: Array.isArray(parsed.friends) ? parsed.friends : [],
+      transactions: Array.isArray(parsed.transactions)
+        ? parsed.transactions
+        : [],
+      payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+    };
+  } catch {
+    return { friends: [], transactions: [], payments: [] };
+  }
+}
+
+export function saveLocalState(state: StoredAppState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Abaikan jika storage penuh atau diblokir browser
+  }
+}
+
+export function clearLocalState(): StoredAppState {
+  const empty: StoredAppState = { friends: [], transactions: [], payments: [] };
+  saveLocalState(empty);
+  return empty;
 }
 
 export function getSampleSimulatedState(): {

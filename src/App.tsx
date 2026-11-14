@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AddDebtModal } from './components/AddDebtModal';
 import { Header } from './components/Header';
 import { MobileNav } from './components/MobileNav';
@@ -16,9 +16,11 @@ import { TransactionTable } from './components/TransactionTable';
 import {
   applyPaymentToTransactions,
   buildNewDebtRecord,
+  clearLocalState,
   computeDashboardSummary,
   getInitialSimulatedState,
   getSampleSimulatedState,
+  saveLocalState,
 } from './services/debtService';
 import type {
   CreateDebtInput,
@@ -57,6 +59,10 @@ export function App() {
     () => computeDashboardSummary(transactions),
     [transactions]
   );
+
+  useEffect(() => {
+    saveLocalState({ friends, transactions, payments });
+  }, [friends, transactions, payments]);
 
   const showFeedback = (message: string) => {
     setFeedbackMessage(message);
@@ -112,7 +118,7 @@ export function App() {
   };
 
   const handleResetEmpty = () => {
-    const empty = getInitialSimulatedState();
+    const empty = clearLocalState();
     setFriends(empty.friends);
     setTransactions(empty.transactions);
     setPayments(empty.payments);
