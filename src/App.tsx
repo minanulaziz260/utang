@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { AddDebtModal } from './components/AddDebtModal';
 import { Header } from './components/Header';
 import { MobileNav } from './components/MobileNav';
+import { PasteDebtModal } from './components/PasteDebtModal';
 import { PaymentModal } from './components/PaymentModal';
 import {
   FriendsView,
@@ -34,6 +35,7 @@ export function App() {
   const [payments, setPayments] = useState(initialState.payments);
 
   const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
+  const [isPasteDebtOpen, setIsPasteDebtOpen] = useState(false);
   const [prefillFriend, setPrefillFriend] = useState<{
     name: string;
     phone?: string;
@@ -72,6 +74,38 @@ export function App() {
     showFeedback(
       `Catatan hutang untuk ${transaction.friendName} ditambahkan ke daftar simulasi.`
     );
+  };
+
+  const handleAddDebtBatch = (inputs: CreateDebtInput[]) => {
+    let workingFriends = [...friends];
+    const newFriendsToAdd: typeof friends = [];
+    const newTransactionsToAdd: DebtTransaction[] = [];
+
+    inputs.forEach((input, idx) => {
+      const { transaction, newFriend } = buildNewDebtRecord(
+        input,
+        workingFriends
+      );
+      const uniqueTransaction: DebtTransaction = {
+        ...transaction,
+        id: `trx-${Date.now()}-${idx}`,
+      };
+      newTransactionsToAdd.push(uniqueTransaction);
+      if (newFriend) {
+        workingFriends = [newFriend, ...workingFriends];
+        newFriendsToAdd.push(newFriend);
+      }
+    });
+
+    if (newFriendsToAdd.length > 0) {
+      setFriends((prev) => [...newFriendsToAdd, ...prev]);
+    }
+    if (newTransactionsToAdd.length > 0) {
+      setTransactions((prev) => [...newTransactionsToAdd, ...prev]);
+      showFeedback(
+        `${newTransactionsToAdd.length} catatan hutang untuk ${newTransactionsToAdd[0].friendName} berhasil ditambahkan.`
+      );
+    }
   };
 
   const handleRecordPayment = (input: RecordPaymentInput) => {
@@ -126,6 +160,7 @@ export function App() {
         <Header
           activeSection={activeSection}
           onOpenAddDebt={() => openAddDebt()}
+          onOpenPasteDebt={() => setIsPasteDebtOpen(true)}
         />
 
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-10 space-y-6">
@@ -218,6 +253,12 @@ export function App() {
           setPrefillFriend(null);
         }}
         onSubmit={handleAddDebt}
+      />
+
+      <PasteDebtModal
+        isOpen={isPasteDebtOpen}
+        onClose={() => setIsPasteDebtOpen(false)}
+        onSubmitBatch={handleAddDebtBatch}
       />
 
       <PaymentModal

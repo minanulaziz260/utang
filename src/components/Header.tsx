@@ -1,9 +1,10 @@
-import { Plus, Wallet } from 'lucide-react';
+import { ClipboardPaste, Plus, Wallet } from 'lucide-react';
 import type { NavSection } from '../types/debt';
 
 interface HeaderProps {
   activeSection: NavSection;
   onOpenAddDebt: () => void;
+  onOpenPasteDebt: () => void;
 }
 
 const SECTION_TITLES: Record<NavSection, { title: string; subtitle: string }> = {
@@ -29,7 +30,11 @@ const SECTION_TITLES: Record<NavSection, { title: string; subtitle: string }> = 
   },
 };
 
-export function Header({ activeSection, onOpenAddDebt }: HeaderProps) {
+export function Header({
+  activeSection,
+  onOpenAddDebt,
+  onOpenPasteDebt,
+}: HeaderProps) {
   const current = SECTION_TITLES[activeSection];
 
   return (
@@ -55,14 +60,25 @@ export function Header({ activeSection, onOpenAddDebt }: HeaderProps) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenAddDebt}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white px-3.5 sm:px-4 py-2.5 min-h-[44px] text-sm font-medium transition-colors shrink-0 shadow-xs"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          <span>Tambah Hutang</span>
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenPasteDebt}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 px-3 sm:px-3.5 py-2.5 min-h-[44px] text-sm font-medium transition-colors"
+          >
+            <ClipboardPaste className="h-4 w-4 text-emerald-700" aria-hidden="true" />
+            <span className="hidden sm:inline">Paste Data</span>
+            <span className="sm:hidden">Paste</span>
+          </button>
+          <button
+            type="button"
+            onClick={onOpenAddDebt}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white px-3.5 sm:px-4 py-2.5 min-h-[44px] text-sm font-medium transition-colors shadow-xs"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            <span>Tambah Hutang</span>
+          </button>
+        </div>
       </div>
     </header>
   );
