@@ -1,0 +1,158 @@
+import type { DebtTransaction, Friend, PaymentRecord } from '../types/debt';
+
+/**
+ * Data simulasi (dummy) untuk pengembangan frontend TemanHutang.
+ * Tidak terhubung ke rekening bank atau database eksternal.
+ */
+export const MOCK_FRIENDS: Friend[] = [
+  {
+    id: 'fr-01',
+    name: 'Rizky Pratama',
+    phone: '0812-3400-1122',
+    note: 'Rekan kerja divisi produk',
+  },
+  {
+    id: 'fr-02',
+    name: 'Nadia Kusuma',
+    phone: '0856-9910-4455',
+    note: 'Teman kuliah',
+  },
+  {
+    id: 'fr-03',
+    name: 'Dimas Saputra',
+    phone: '0813-7788-2090',
+    note: 'Tetangga komplek',
+  },
+  {
+    id: 'fr-04',
+    name: 'Siti Rahmawati',
+    phone: '0878-5120-8831',
+    note: 'Teman komunitas lari',
+  },
+  {
+    id: 'fr-05',
+    name: 'Fajar Nugroho',
+    phone: '0821-4409-6712',
+    note: 'Sepupu',
+  },
+  {
+    id: 'fr-06',
+    name: 'Ayu Lestari',
+    phone: '0819-3302-7740',
+    note: 'Rekan freelance',
+  },
+];
+
+export const MOCK_TRANSACTIONS: DebtTransaction[] = [
+  {
+    id: 'trx-101',
+    friendId: 'fr-01',
+    friendName: 'Rizky Pratama',
+    bank: 'Bank Jago',
+    principalAmount: 2500000,
+    remainingAmount: 1500000,
+    dueDate: '2026-11-25',
+    createdAt: '2026-10-25',
+    status: 'belum_lunas',
+    notes: 'Talangan tiket pesawat dinas, cicil 2x.',
+  },
+  {
+    id: 'trx-102',
+    friendId: 'fr-02',
+    friendName: 'Nadia Kusuma',
+    bank: 'SeaBank',
+    principalAmount: 1200000,
+    remainingAmount: 1200000,
+    dueDate: '2026-11-05',
+    createdAt: '2026-10-12',
+    status: 'terlambat',
+    notes: 'Pinjaman dana darurat servis laptop.',
+  },
+  {
+    id: 'trx-103',
+    friendId: 'fr-03',
+    friendName: 'Dimas Saputra',
+    bank: 'Kredivo',
+    principalAmount: 1800000,
+    remainingAmount: 0,
+    dueDate: '2026-11-01',
+    createdAt: '2026-10-01',
+    status: 'lunas',
+    notes: 'Patungan pembelian peralatan rumah tangga.',
+  },
+  {
+    id: 'trx-104',
+    friendId: 'fr-04',
+    friendName: 'Siti Rahmawati',
+    bank: 'Allo Bank',
+    principalAmount: 750000,
+    remainingAmount: 750000,
+    dueDate: '2026-11-30',
+    createdAt: '2026-11-02',
+    status: 'belum_lunas',
+    notes: 'Talangan registrasi lomba lari maraton.',
+  },
+  {
+    id: 'trx-105',
+    friendId: 'fr-05',
+    friendName: 'Fajar Nugroho',
+    bank: 'JULO',
+    principalAmount: 3000000,
+    remainingAmount: 2000000,
+    dueDate: '2026-11-10',
+    createdAt: '2026-09-28',
+    status: 'terlambat',
+    notes: 'Bantuan modal usaha kecil, sisa 2 termin.',
+  },
+  {
+    id: 'trx-106',
+    friendId: 'fr-06',
+    friendName: 'Ayu Lestari',
+    bank: 'Superbank',
+    principalAmount: 950000,
+    remainingAmount: 0,
+    dueDate: '2026-11-12',
+    createdAt: '2026-10-20',
+    status: 'lunas',
+    notes: 'Pembayaran sewa studio foto.',
+  },
+];
+
+export const MOCK_PAYMENTS: PaymentRecord[] = [
+  {
+    id: 'pay-201',
+    transactionId: 'trx-101',
+    friendName: 'Rizky Pratama',
+    bank: 'Bank Jago',
+    amount: 1000000,
+    paidAt: '2026-11-08',
+    note: 'Cicilan tahap pertama via transfer',
+  },
+  {
+    id: 'pay-202',
+    transactionId: 'trx-103',
+    friendName: 'Dimas Saputra',
+    bank: 'Kredivo',
+    amount: 1800000,
+    paidAt: '2026-10-30',
+    note: 'Pelunasan penuh',
+  },
+  {
+    id: 'pay-203',
+    transactionId: 'trx-105',
+    friendName: 'Fajar Nugroho',
+    bank: 'JULO',
+    amount: 1000000,
+    paidAt: '2026-10-28',
+    note: 'Pembayaran termin 1',
+  },
+  {
+    id: 'pay-204',
+    transactionId: 'trx-106',
+    friendName: 'Ayu Lestari',
+    bank: 'Superbank',
+    amount: 950000,
+    paidAt: '2026-11-11',
+    note: 'Pelunasan sebelum jatuh tempo',
+  },
+];
