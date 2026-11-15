@@ -8,10 +8,22 @@ import {
   X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { cn } from '../lib/utils';
 import type { DebtStatus, DebtTransaction } from '../types/debt';
 import { formatDateId, formatRupiah } from '../utils/formatters';
 import { FriendDebtGroupList } from './FriendDebtGroupList';
 import { StatusBadge } from './StatusBadge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Input } from './ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './ui/table';
 
 interface TransactionTableProps {
   transactions: DebtTransaction[];
@@ -72,27 +84,24 @@ export function TransactionTable({
   const hasActiveFilter = searchQuery.trim() !== '' || statusFilter !== 'all';
 
   return (
-    <section
-      aria-labelledby="transactions-heading"
-      className="rounded-xl bg-white border border-slate-200 shadow-xs overflow-hidden"
-    >
-      <div className="p-4 sm:p-5 border-b border-slate-200 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <Card aria-labelledby="transactions-heading" className="overflow-hidden">
+      <div className="space-y-4 border-b border-border p-4 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2
               id="transactions-heading"
-              className="text-base font-semibold text-slate-900"
+              className="text-base font-semibold tracking-tight text-foreground"
             >
               {title}
             </h2>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted-foreground">
               Menampilkan {filteredTransactions.length} dari{' '}
-              {transactions.length} catatan simulasi
+              {transactions.length} catatan
             </p>
           </div>
 
           <div
-            className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1 self-start sm:self-auto"
+            className="inline-flex self-start rounded-lg border border-border bg-muted p-1 sm:self-auto"
             role="group"
             aria-label="Mode tampilan transaksi"
           >
@@ -100,11 +109,12 @@ export function TransactionTable({
               type="button"
               onClick={() => setViewMode('grouped')}
               aria-pressed={viewMode === 'grouped'}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 min-h-[36px] text-xs font-medium transition-colors ${
+              className={cn(
+                'inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 viewMode === 'grouped'
-                  ? 'bg-white text-emerald-800 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Per Teman</span>
@@ -113,11 +123,12 @@ export function TransactionTable({
               type="button"
               onClick={() => setViewMode('table')}
               aria-pressed={viewMode === 'table'}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 min-h-[36px] text-xs font-medium transition-colors ${
+              className={cn(
+                'inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 viewMode === 'table'
-                  ? 'bg-white text-emerald-800 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               <Table2 className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Tabel</span>
@@ -126,29 +137,29 @@ export function TransactionTable({
         </div>
 
         {showFilters && (
-          <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
               <label htmlFor="trx-search" className="sr-only">
                 Cari nama teman atau bank
               </label>
               <Search
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500"
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
               />
-              <input
+              <Input
                 id="trx-search"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari nama teman atau bank..."
-                className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-9 py-2 min-h-[44px] text-sm text-slate-900 placeholder:text-slate-500 focus:border-emerald-700 focus:outline-none"
+                className="pl-9 pr-9"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   aria-label="Hapus kata kunci pencarian"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-slate-800 rounded-md"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -163,19 +174,16 @@ export function TransactionTable({
               {STATUS_FILTERS.map((filter) => {
                 const active = statusFilter === filter.id;
                 return (
-                  <button
+                  <Button
                     key={filter.id}
-                    type="button"
+                    variant={active ? 'default' : 'outline'}
+                    size="sm"
                     onClick={() => setStatusFilter(filter.id)}
                     aria-pressed={active}
-                    className={`rounded-lg px-3 py-2 min-h-[40px] text-xs font-medium transition-colors border ${
-                      active
-                        ? 'bg-emerald-700 text-white border-emerald-700'
-                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-                    }`}
+                    className="min-h-[40px]"
                   >
                     {filter.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -183,85 +191,70 @@ export function TransactionTable({
         )}
       </div>
 
-      {/* Loading State */}
       {isLoading && (
         <div
           role="status"
           aria-live="polite"
-          className="p-8 text-center space-y-2"
+          className="space-y-2 p-8 text-center"
         >
-          <p className="text-sm font-medium text-slate-800">
+          <p className="text-sm font-medium text-foreground">
             Memuat data transaksi...
           </p>
-          <p className="text-xs text-slate-600">
-            Menyiapkan daftar piutang simulasi.
+          <p className="text-xs text-muted-foreground">
+            Menyiapkan daftar piutang lokal.
           </p>
         </div>
       )}
 
-      {/* Error State */}
       {!isLoading && errorMessage && (
-        <div role="alert" className="p-8 text-center space-y-3">
+        <div role="alert" className="space-y-3 p-8 text-center">
           <p className="text-sm font-semibold text-rose-800">
             Gagal memuat transaksi
           </p>
-          <p className="text-xs text-slate-600">{errorMessage}</p>
+          <p className="text-xs text-muted-foreground">{errorMessage}</p>
           {onRetry && (
-            <button
-              type="button"
-              onClick={onRetry}
-              className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 min-h-[44px] text-xs font-medium text-slate-800 hover:bg-slate-50"
-            >
+            <Button variant="outline" size="sm" onClick={onRetry}>
               Coba Lagi
-            </button>
+            </Button>
           )}
         </div>
       )}
 
-      {/* Empty State */}
       {!isLoading && !errorMessage && filteredTransactions.length === 0 && (
-        <div className="p-8 sm:p-10 text-center space-y-3">
-          <p className="text-sm font-semibold text-slate-900">
+        <div className="space-y-3 p-8 text-center sm:p-10">
+          <p className="text-sm font-semibold text-foreground">
             {hasActiveFilter
               ? 'Tidak ada transaksi yang cocok'
               : 'Belum ada catatan hutang'}
           </p>
-          <p className="text-xs text-slate-600 max-w-sm mx-auto">
+          <p className="mx-auto max-w-sm text-xs text-muted-foreground">
             {hasActiveFilter
               ? 'Ubah kata kunci pencarian atau pilih filter status lain.'
               : 'Tambahkan catatan hutang pertama untuk mulai memantau piutang teman.'}
           </p>
-          <div className="pt-1 flex justify-center gap-2">
+          <div className="flex justify-center gap-2 pt-1">
             {hasActiveFilter ? (
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('all');
                 }}
-                className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 min-h-[44px] text-xs font-medium text-slate-800 hover:bg-slate-50"
               >
                 Reset Filter
-              </button>
+              </Button>
             ) : (
-              <button
-                type="button"
-                onClick={onOpenAddDebt}
-                className="inline-flex items-center rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 min-h-[44px] text-xs font-medium"
-              >
-                Tambah Hutang Baru
-              </button>
+              <Button onClick={onOpenAddDebt}>Tambah Hutang Baru</Button>
             )}
           </div>
         </div>
       )}
 
-      {/* Grouped Friend Cards View (default) */}
       {!isLoading &&
         !errorMessage &&
         filteredTransactions.length > 0 &&
         viewMode === 'grouped' && (
-          <div className="p-4 sm:p-5 bg-slate-50/50">
+          <div className="bg-muted/30 p-4 sm:p-5">
             <FriendDebtGroupList
               transactions={filteredTransactions}
               onRecordPayment={onRecordPayment}
@@ -273,100 +266,80 @@ export function TransactionTable({
           </div>
         )}
 
-      {/* Desktop 7-Column Table View */}
       {!isLoading &&
         !errorMessage &&
         filteredTransactions.length > 0 &&
         viewMode === 'table' && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
-                  <th scope="col" className="py-3.5 pl-5 pr-3">
-                    Nama Teman
-                  </th>
-                  <th scope="col" className="py-3.5 px-3">
-                    Bank/Layanan
-                  </th>
-                  <th scope="col" className="py-3.5 px-3 text-right">
-                    Nominal Hutang
-                  </th>
-                  <th scope="col" className="py-3.5 px-3">
-                    Tanggal Jatuh Tempo
-                  </th>
-                  <th scope="col" className="py-3.5 px-3 text-right">
-                    Sisa Hutang
-                  </th>
-                  <th scope="col" className="py-3.5 px-3">
-                    Status
-                  </th>
-                  <th scope="col" className="py-3.5 pl-3 pr-5 text-right">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 text-sm">
-                {filteredTransactions.map((trx) => (
-                  <tr
-                    key={trx.id}
-                    className="hover:bg-slate-50/80 transition-colors"
-                  >
-                    <td className="py-3.5 pl-5 pr-3 font-medium text-slate-900">
-                      {trx.friendName}
-                    </td>
-                    <td className="py-3.5 px-3 text-slate-700">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Building2
-                          className="h-3.5 w-3.5 text-slate-500 shrink-0"
-                          aria-hidden="true"
-                        />
-                        <span>{trx.bank}</span>
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-medium text-slate-900 tabular-nums whitespace-nowrap">
-                      {formatRupiah(trx.principalAmount)}
-                    </td>
-                    <td className="py-3.5 px-3 text-slate-700 tabular-nums whitespace-nowrap">
-                      {formatDateId(trx.dueDate)}
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-semibold text-slate-900 tabular-nums whitespace-nowrap">
-                      {formatRupiah(trx.remainingAmount)}
-                    </td>
-                    <td className="py-3.5 px-3">
-                      <StatusBadge status={trx.status} />
-                    </td>
-                    <td className="py-3.5 pl-3 pr-5 text-right">
-                      <div className="inline-flex items-center justify-end gap-2">
-                        {trx.remainingAmount > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => onRecordPayment(trx)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 min-h-[36px] text-xs font-medium transition-colors"
-                          >
-                            <ReceiptText
-                              className="h-3.5 w-3.5"
-                              aria-hidden="true"
-                            />
-                            <span>Bayar</span>
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => onViewDetail(trx)}
-                          aria-label={`Lihat detail hutang ${trx.friendName}`}
-                          className="inline-flex items-center gap-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-1.5 min-h-[36px] text-xs font-medium transition-colors"
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="pl-5">Nama Teman</TableHead>
+                <TableHead>Bank/Layanan</TableHead>
+                <TableHead className="text-right">Nominal Hutang</TableHead>
+                <TableHead>Tanggal Jatuh Tempo</TableHead>
+                <TableHead className="text-right">Sisa Hutang</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="pr-5 text-right">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTransactions.map((trx) => (
+                <TableRow key={trx.id}>
+                  <TableCell className="pl-5 font-medium text-foreground">
+                    {trx.friendName}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Building2
+                        className="h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{trx.bank}</span>
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-medium text-foreground tabular-nums whitespace-nowrap">
+                    {formatRupiah(trx.principalAmount)}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground tabular-nums whitespace-nowrap">
+                    {formatDateId(trx.dueDate)}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold text-foreground tabular-nums whitespace-nowrap">
+                    {formatRupiah(trx.remainingAmount)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={trx.status} />
+                  </TableCell>
+                  <TableCell className="pr-5 text-right">
+                    <div className="inline-flex items-center justify-end gap-2">
+                      {trx.remainingAmount > 0 && (
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() => onRecordPayment(trx)}
                         >
-                          <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>Detail</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          <ReceiptText
+                            className="h-3.5 w-3.5"
+                            aria-hidden="true"
+                          />
+                          <span>Bayar</span>
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onViewDetail(trx)}
+                        aria-label={`Lihat detail hutang ${trx.friendName}`}
+                      >
+                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Detail</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
-    </section>
+    </Card>
   );
 }

@@ -12,6 +12,8 @@ import { useMemo, useState } from 'react';
 import type { DebtTransaction } from '../types/debt';
 import { formatDateSlash, formatRupiah } from '../utils/formatters';
 import { StatusBadge } from './StatusBadge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 
 interface FriendDebtGroupListProps {
   transactions: DebtTransaction[];
@@ -97,78 +99,75 @@ export function FriendDebtGroupList({
         const initial = group.friendName.trim().charAt(0).toUpperCase() || '?';
 
         return (
-          <article
-            key={group.friendName}
-            className="rounded-xl bg-white border border-slate-200 shadow-xs overflow-hidden"
-          >
-            {/* Header kartu nama teman */}
-            <div className="px-4 sm:px-5 py-4 flex items-center justify-between gap-3">
+          <Card key={group.friendName} className="overflow-hidden">
+            <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-5">
               <button
                 type="button"
                 onClick={() => toggleCollapse(group.friendName)}
                 aria-expanded={!isCollapsed}
-                className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                className="flex min-w-0 flex-1 items-center gap-3 text-left"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-bold">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-sm font-semibold text-primary">
                   {initial}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm sm:text-base font-semibold text-slate-900 truncate">
+                  <h3 className="truncate text-sm font-semibold text-foreground sm:text-base">
                     {group.friendName}
                   </h3>
-                  <p className="text-xs text-slate-600 mt-0.5">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {group.items.length} hutang · {group.unpaidCount} belum
                   </p>
                 </div>
               </button>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <span className="text-sm sm:text-base font-bold text-slate-900 tabular-nums mr-1">
+              <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+                <span className="mr-1 text-sm font-semibold text-foreground tabular-nums sm:text-base">
                   {formatRupiah(group.totalRemaining)}
                 </span>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => handleCopy(group)}
                   aria-label={`Salin ringkasan hutang ${group.friendName}`}
                   title="Salin ringkasan"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="h-9 w-9 text-muted-foreground hover:text-foreground"
                 >
                   <Copy className="h-4 w-4" aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => toggleCollapse(group.friendName)}
                   aria-label={
                     isCollapsed
                       ? `Tampilkan daftar hutang ${group.friendName}`
                       : `Sembunyikan daftar hutang ${group.friendName}`
                   }
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="h-9 w-9 text-muted-foreground hover:text-foreground"
                 >
                   {isCollapsed ? (
                     <ChevronDown className="h-4 w-4" aria-hidden="true" />
                   ) : (
                     <ChevronUp className="h-4 w-4" aria-hidden="true" />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
-            {/* Daftar hutang satu baris per item di bawah nama */}
             {!isCollapsed && (
               <>
-                <div className="divide-y divide-slate-200 border-t border-slate-200">
+                <div className="divide-y divide-border border-t border-border">
                   {group.items.map((trx) => (
                     <div
                       key={trx.id}
-                      className="px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
+                      className="flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-muted/40 sm:px-5"
                     >
                       <div className="min-w-0 space-y-1.5">
                         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                          <span className="text-sm font-medium text-slate-900">
+                          <span className="text-sm font-medium text-foreground">
                             {trx.bank}
                           </span>
-                          <span className="text-sm font-semibold text-slate-900 tabular-nums">
+                          <span className="text-sm font-semibold text-foreground tabular-nums">
                             {formatRupiah(
                               trx.remainingAmount > 0
                                 ? trx.remainingAmount
@@ -177,16 +176,16 @@ export function FriendDebtGroupList({
                           </span>
                           {trx.remainingAmount > 0 &&
                             trx.remainingAmount < trx.principalAmount && (
-                              <span className="text-xs text-slate-500 tabular-nums">
+                              <span className="text-xs text-muted-foreground tabular-nums">
                                 (awal {formatRupiah(trx.principalAmount)})
                               </span>
                             )}
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2.5">
-                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 tabular-nums">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums">
                             <Calendar
-                              className="h-3.5 w-3.5 text-slate-500 shrink-0"
+                              className="h-3.5 w-3.5 shrink-0"
                               aria-hidden="true"
                             />
                             <span>{formatDateSlash(trx.dueDate)}</span>
@@ -195,47 +194,49 @@ export function FriendDebtGroupList({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex shrink-0 items-center gap-1">
                         {trx.remainingAmount > 0 && (
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => onRecordPayment(trx)}
                             aria-label={`Catat bayar ${trx.bank} untuk ${trx.friendName}`}
                             title="Catat Bayar"
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors"
+                            className="text-primary hover:bg-emerald-50 hover:text-emerald-800"
                           >
                             <Check className="h-4 w-4" aria-hidden="true" />
-                          </button>
+                          </Button>
                         )}
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => onViewDetail(trx)}
                           aria-label={`Lihat detail ${trx.bank} untuk ${trx.friendName}`}
                           title="Detail"
-                          className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                          className="text-muted-foreground hover:text-foreground"
                         >
                           <Eye className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                        <button
-                          type="button"
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => onDeleteTransaction(trx)}
                           aria-label={`Hapus catatan ${trx.bank} untuk ${trx.friendName}`}
                           title="Hapus"
-                          className="flex h-10 w-10 items-center justify-center rounded-lg text-rose-700 hover:bg-rose-50 transition-colors"
+                          className="text-rose-700 hover:bg-rose-50 hover:text-rose-800"
                         >
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Tombol tambah hutang untuk teman ini */}
-                <div className="border-t border-slate-200 bg-slate-50/40">
+                <div className="border-t border-border bg-muted/30">
                   <button
                     type="button"
                     onClick={() => onAddDebtForFriend(group.friendName)}
-                    className="w-full py-3 px-4 min-h-[44px] inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium text-emerald-800 hover:bg-emerald-50 transition-colors"
+                    className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 px-4 py-3 text-xs font-medium text-primary transition-colors hover:bg-emerald-50/70 sm:text-sm"
                   >
                     <Plus className="h-4 w-4" aria-hidden="true" />
                     <span>Tambah hutang untuk {group.friendName}</span>
@@ -243,7 +244,7 @@ export function FriendDebtGroupList({
                 </div>
               </>
             )}
-          </article>
+          </Card>
         );
       })}
     </div>

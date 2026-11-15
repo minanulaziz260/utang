@@ -145,7 +145,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-dvh bg-slate-50 text-slate-900">
+    <div className="min-h-dvh bg-zinc-50/70 text-foreground">
       <Sidebar
         activeSection={activeSection}
         onSelectSection={setActiveSection}

@@ -5,6 +5,7 @@ import {
   Settings,
   Users,
 } from 'lucide-react';
+import { cn } from '../lib/utils';
 import type { NavSection } from '../types/debt';
 
 interface MobileNavProps {
@@ -28,7 +29,7 @@ export function MobileNav({ activeSection, onSelectSection }: MobileNavProps) {
   return (
     <nav
       aria-label="Navigasi seluler"
-      className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)]"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]"
     >
       <div className="grid grid-cols-5">
         {MOBILE_ITEMS.map((item) => {
@@ -40,20 +41,24 @@ export function MobileNav({ activeSection, onSelectSection }: MobileNavProps) {
               type="button"
               onClick={() => onSelectSection(item.id)}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex flex-col items-center justify-center gap-1 py-2 px-1 min-h-[56px] text-[11px] font-medium transition-colors ${
+              className={cn(
+                'relative flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium transition-colors',
                 isActive
-                  ? 'text-emerald-800 bg-emerald-50/60'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               {isActive && (
                 <span
-                  className="absolute top-0 inset-x-3 h-0.5 bg-emerald-700 rounded-b"
+                  className="absolute top-0 inset-x-3 h-0.5 rounded-b bg-primary"
                   aria-hidden="true"
                 />
               )}
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              <span className="truncate max-w-full">{item.label}</span>
+              <Icon
+                className={cn('h-5 w-5', isActive ? 'text-primary' : '')}
+                aria-hidden="true"
+              />
+              <span className="max-w-full truncate">{item.label}</span>
             </button>
           );
         })}

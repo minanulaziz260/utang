@@ -6,6 +6,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
+import { cn } from '../lib/utils';
 import type { NavSection } from '../types/debt';
 
 interface SidebarProps {
@@ -25,21 +26,21 @@ export function Sidebar({ activeSection, onSelectSection }: SidebarProps) {
   return (
     <aside
       aria-label="Navigasi utama"
-      className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-slate-200"
+      className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-border bg-card"
     >
-      <div className="flex items-center gap-3 px-6 h-16 border-b border-slate-200">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700 text-white">
-          <Wallet className="h-5 w-5" aria-hidden="true" />
+      <div className="flex h-16 items-center gap-3 border-b border-border px-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
+          <Wallet className="h-4 w-4" aria-hidden="true" />
         </div>
         <div>
-          <span className="text-base font-bold tracking-tight text-slate-900">
+          <span className="text-sm font-semibold tracking-tight text-foreground">
             TemanHutang
           </span>
-          <p className="text-xs text-slate-600">Catatan Piutang Pribadi</p>
+          <p className="text-xs text-muted-foreground">Catatan Piutang</p>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-5 space-y-1">
+      <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -49,16 +50,18 @@ export function Sidebar({ activeSection, onSelectSection }: SidebarProps) {
               type="button"
               onClick={() => onSelectSection(item.id)}
               aria-current={isActive ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+              className={cn(
+                'flex w-full min-h-[44px] items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent'
-              }`}
+                  ? 'bg-accent text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'
+              )}
             >
               <Icon
-                className={`h-4 w-4 shrink-0 ${
-                  isActive ? 'text-emerald-700' : 'text-slate-500'
-                }`}
+                className={cn(
+                  'h-4 w-4 shrink-0',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
+                )}
                 aria-hidden="true"
               />
               <span>{item.label}</span>
@@ -67,10 +70,10 @@ export function Sidebar({ activeSection, onSelectSection }: SidebarProps) {
         })}
       </nav>
 
-      <div className="p-4 m-3 rounded-xl bg-slate-50 border border-slate-200">
-        <p className="text-xs font-semibold text-slate-800">Mode Simulasi</p>
-        <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-          Menampilkan data contoh di browser. Belum terhubung ke Supabase.
+      <div className="m-3 rounded-lg border border-border bg-muted/50 p-3.5">
+        <p className="text-xs font-semibold text-foreground">Penyimpanan Lokal</p>
+        <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+          Data tersimpan di browser ini. Belum terhubung ke Supabase.
         </p>
       </div>
     </aside>
